@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test API - CORS</title>
+  <style>
+    * {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    article {
+      border: 2px solid #d3d3d3;
+      margin: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      width: 100%;
+      height: auto;
+      max-width: 640px;
+    }
+
+    main {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+    }
+
+    h2 {
+      color: #333333;
+      font-size: 2rem;
+      text-transform: uppercase;
+    }
+
+    h3 {
+      color: #2f2f2f;
+      font-size: 1rem;
+    }
+
+    h4 {
+      color: gray;
+    }
+
+    button {
+      display: block;
+      border: none;
+      background-color: steelblue;
+      color: white;
+      width: min-content;
+      height: auto;
+      padding: 10px 20px;
+      margin: auto;
+
+      &:hover {
+        opacity: 80%;
+      }
+    }
+  </style>
+  <script type="module">
+    fetch('http://localhost:3000/movies')
+      .then(res => res.json())
+      .then(movies => {
+        const articles = movies.map(movie => (
+          `
+            <article data-id=${movie.id}>
+              <h2> ${movie.title} </h2>
+              <img src=${movie.poster} alt=${movie.title} />
+              <footer> 
+                <h3>${movie.year}</h3>
+                <h4>${movie.genre.join(' - ')}
+                <button>Delete</button>
+              </footer>  
+            </article>
+          `
+        )).join('')
+
+        document.querySelector('main').innerHTML = articles
+        document.addEventListener('click', e => {
+          const article = e.target.closest('article')
+          const { id } = article.dataset
+
+          fetch(`http://localhost:3000/movies/${id}`, {
+            method: 'DELETE'
+          })
+            .then(res => {
+              if (res.ok) article.remove()
+            })
+        })
+      })
+  </script>
+</head>
+
+<body>
+  <main></main>
+</body>
+
+</html>
